@@ -2,38 +2,55 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Crypto Sim</title>
+<title>Trade Sim Pro</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>💰 Crypto Sim</h1>
+<header>
+  <h1>📊 Trade Sim Pro</h1>
+</header>
 
-<div class="container">
+<div class="main">
 
-  <div class="panel">
-    <h2>価格</h2>
-    <div id="price">0</div>
-    <canvas id="chart" width="300" height="150"></canvas>
+  <div class="left">
+
+    <div class="card">
+      <h2>BTC/JPY</h2>
+      <div id="price" class="price">0</div>
+      <div id="change" class="change">0%</div>
+      <canvas id="chart" width="500" height="250"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>ニュース</h2>
+      <div id="news">市場は安定しています</div>
+    </div>
+
   </div>
 
-  <div class="panel">
-    <h2>あなたの資産</h2>
-    <p>現金: <span id="cash"></span></p>
-    <p>コイン: <span id="coin"></span></p>
-    <p>合計: <span id="total"></span></p>
-  </div>
+  <div class="right">
 
-  <div class="panel">
-    <h2>売買</h2>
-    <input type="number" id="amount" placeholder="数量">
-    <button onclick="buy()">BUY</button>
-    <button onclick="sell()">SELL</button>
-  </div>
+    <div class="card">
+      <h2>資産</h2>
+      <p>現金: <span id="cash"></span></p>
+      <p>保有: <span id="coin"></span> BTC</p>
+      <p>総資産: <span id="total"></span></p>
+    </div>
 
-  <div class="panel">
-    <h2>ランキング（1週間）</h2>
-    <ol id="ranking"></ol>
+    <div class="card">
+      <h2>取引</h2>
+      <button onclick="buyAll()">全部買う</button>
+      <button onclick="buyHalf()">半分買う</button>
+      <button onclick="sellHalf()">半分売る</button>
+      <button onclick="sellAll()">全部売る</button>
+    </div>
+
+    <div class="card">
+      <h2>ランキング</h2>
+      <ol id="ranking"></ol>
+    </div>
+
   </div>
 
 </div>
