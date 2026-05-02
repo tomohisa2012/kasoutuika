@@ -1,0 +1,42 @@
+body{
+  font-family: Arial;
+  background:#0f172a;
+  color:#fff;
+  text-align:center;
+}
+
+h1{
+  margin:20px;
+}
+
+.container{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:20px;
+}
+
+.panel{
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  width:250px;
+  box-shadow:0 0 10px rgba(0,0,0,0.5);
+}
+
+button{
+  margin:5px;
+  padding:8px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.8;
+}
+
+#price{
+  font-size:24px;
+  margin:10px;
+}
