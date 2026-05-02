@@ -1,43 +1,51 @@
-let price = 5000;
-let prevPrice = price;
-let history = [];
+let candles = [];
+let price = 30000;
+
+let trend = 0; // -1 下げ / 0 横 / 1 上げ
+let trendPower = 0;
 
 let cash = 100000;
 let coin = 0;
 
-const priceEl = document.getElementById("price");
-const changeEl = document.getElementById("change");
-
-function updateUI(){
-  let change = ((price - prevPrice)/prevPrice)*100;
-
-  priceEl.innerText = price.toFixed(0) + " 円";
-  changeEl.innerText = change.toFixed(2) + "%";
-
-  changeEl.className = "change " + (change >= 0 ? "up" : "down");
-
-  document.getElementById("cash").innerText = cash.toFixed(0);
-  document.getElementById("coin").innerText = coin.toFixed(4);
-  document.getElementById("total").innerText = (cash + coin * price).toFixed(0);
+// 初期データ生成
+for(let i=0;i<50;i++){
+  generateCandle();
 }
 
-function updatePrice(){
-  prevPrice = price;
+function generateCandle(){
+  let open = price;
 
-  let change = (Math.random()-0.5)*200;
+  // トレンド変化
+  if(Math.random() < 0.05){
+    trend = Math.floor(Math.random()*3) - 1;
+    trendPower = Math.random()*200;
+  }
 
-  // トレンド
-  if(Math.random() < 0.05) change += 800;
-  if(Math.random() < 0.05) change -= 800;
+  let move = (Math.random()-0.5)*200 + trend * trendPower;
 
-  price += change;
-  if(price < 100) price = 100;
+  let close = open + move;
+  let high = Math.max(open, close) + Math.random()*100;
+  let low = Math.min(open, close) - Math.random()*100;
 
-  history.push(price);
-  if(history.length > 80) history.shift();
+  price = close;
 
-  drawChart();
-  updateUI();
+  candles.push({open, high, low, close});
+  if(candles.length > 60) candles.shift();
+}
+
+// 移動平均
+function getMA(period){
+  let ma = [];
+  for(let i=0;i<candles.length;i++){
+    if(i < period) continue;
+
+    let sum = 0;
+    for(let j=0;j<period;j++){
+      sum += candles[i-j].close;
+    }
+    ma.push(sum/period);
+  }
+  return ma;
 }
 
 function drawChart(){
@@ -46,16 +54,69 @@ function drawChart(){
 
   ctx.clearRect(0,0,500,250);
 
+  let candleWidth = 6;
+
+  // ローソク足
+  candles.forEach((c, i)=>{
+    let x = i * 8;
+
+    let openY = 250 - c.open/200;
+    let closeY = 250 - c.close/200;
+    let highY = 250 - c.high/200;
+    let lowY = 250 - c.low/200;
+
+    let color = c.close > c.open ? "#22c55e" : "#ef4444";
+
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, highY);
+    ctx.lineTo(x, lowY);
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.fillRect(
+      x - candleWidth/2,
+      Math.min(openY, closeY),
+      candleWidth,
+      Math.abs(openY - closeY) || 1
+    );
+  });
+
+  // 移動平均（短期）
+  let ma5 = getMA(5);
   ctx.beginPath();
-
-  for(let i=0;i<history.length;i++){
-    let x = i * 6;
-    let y = 250 - (history[i]/50);
+  ctx.strokeStyle = "#22c55e";
+  ma5.forEach((v,i)=>{
+    let x = (i+5)*8;
+    let y = 250 - v/200;
     ctx.lineTo(x,y);
-  }
-
-  ctx.strokeStyle = "#3b82f6";
+  });
   ctx.stroke();
+
+  // 移動平均（長期）
+  let ma15 = getMA(15);
+  ctx.beginPath();
+  ctx.strokeStyle = "#ef4444";
+  ma15.forEach((v,i)=>{
+    let x = (i+15)*8;
+    let y = 250 - v/200;
+    ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+
+function updateUI(){
+  document.getElementById("price").innerText =
+    Math.floor(price) + " 円";
+
+  document.getElementById("cash").innerText =
+    Math.floor(cash);
+
+  document.getElementById("coin").innerText =
+    coin.toFixed(4);
+
+  document.getElementById("total").innerText =
+    Math.floor(cash + coin * price);
 }
 
 // 取引
@@ -65,72 +126,14 @@ function buyAll(){
   cash = 0;
 }
 
-function buyHalf(){
-  let amt = (cash/2) / price;
-  coin += amt;
-  cash /= 2;
-}
-
-function sellHalf(){
-  let amt = coin/2;
-  cash += amt * price;
-  coin /= 2;
-}
-
 function sellAll(){
   cash += coin * price;
   coin = 0;
 }
 
-// ニュース
-function randomNews(){
-  const newsList = [
-    "📈 大企業が参入 → 爆上げ",
-    "💥 ハッキング事件 → 暴落",
-    "🏦 規制強化 → 下落",
-    "🚀 バブル発生 → 上昇中",
-    "😐 特に何もなし"
-  ];
-
-  let text = newsList[Math.floor(Math.random()*newsList.length)];
-  document.getElementById("news").innerText = text;
-}
-
-// ランキング
-function saveScore(){
-  let total = cash + coin * price;
-  let data = JSON.parse(localStorage.getItem("ranking") || "[]");
-
-  data.push({score: total, date: Date.now()});
-
-  let week = 7*24*60*60*1000;
-  data = data.filter(d => Date.now() - d.date < week);
-
-  data.sort((a,b)=>b.score-a.score);
-  data = data.slice(0,5);
-
-  localStorage.setItem("ranking", JSON.stringify(data));
-}
-
-function loadRanking(){
-  let data = JSON.parse(localStorage.getItem("ranking") || "[]");
-  let list = document.getElementById("ranking");
-  list.innerHTML = "";
-
-  data.forEach(d=>{
-    let li = document.createElement("li");
-    li.innerText = Math.floor(d.score) + " 円";
-    list.appendChild(li);
-  });
-}
-
 // ループ
-setInterval(updatePrice, 1000);
-setInterval(randomNews, 5000);
 setInterval(()=>{
-  saveScore();
-  loadRanking();
-},30000);
-
-updateUI();
-loadRanking();
+  generateCandle();
+  drawChart();
+  updateUI();
+}, 1000);
