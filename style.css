@@ -1,42 +1,58 @@
 body{
-  font-family: Arial;
-  background:#0f172a;
-  color:#fff;
+  margin:0;
+  font-family:Arial;
+  background:#0b0f19;
+  color:#e5e7eb;
+}
+
+header{
+  padding:10px;
+  background:#111827;
   text-align:center;
+  border-bottom:1px solid #333;
 }
 
-h1{
-  margin:20px;
-}
-
-.container{
+.main{
   display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
+  padding:20px;
   gap:20px;
 }
 
-.panel{
-  background:#1e293b;
+.left{ flex:2; }
+.right{ flex:1; }
+
+.card{
+  background:#111827;
   padding:15px;
-  border-radius:10px;
-  width:250px;
-  box-shadow:0 0 10px rgba(0,0,0,0.5);
+  margin-bottom:20px;
+  border-radius:12px;
+  box-shadow:0 0 15px rgba(0,0,0,0.6);
 }
 
+.price{
+  font-size:32px;
+  font-weight:bold;
+}
+
+.change{
+  font-size:18px;
+  margin-bottom:10px;
+}
+
+.up{ color:#22c55e; }
+.down{ color:#ef4444; }
+
 button{
-  margin:5px;
-  padding:8px;
+  width:100%;
+  margin:5px 0;
+  padding:10px;
   border:none;
-  border-radius:5px;
+  border-radius:8px;
+  background:#1f2937;
+  color:white;
   cursor:pointer;
 }
 
 button:hover{
-  opacity:0.8;
-}
-
-#price{
-  font-size:24px;
-  margin:10px;
+  background:#374151;
 }
